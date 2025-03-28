@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -15,3 +16,65 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+=======
+package com.flightapi.service;
+
+
+import com.flightapi.dto.FlightRoute;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+@Service
+public class FlightRouteFinder {
+    static class Node {
+        String data;
+        int cost;
+
+        public Node(String data, int cost) {
+            this.data = data;
+            this.cost = cost;
+        }
+    }
+
+    private final Map<String, List<Node>> flightGraph = new HashMap<>();
+
+    private void buildGraph(List<Flight> flights) {
+        for (Flight flight : flights) {
+            flightGraph.putIfAbsent(flight.origin, new ArrayList<>());
+            if(flight.origin.equals(flight.destination)) {
+                throw new RuntimeException("Flights from the origin city to the origin city are not allowed.");
+            }
+            flightGraph.get(flight.origin).add(new Node(flight.destination, flight.cost));
+        }
+    }
+
+    private List<FlightRoute> findRoutes(String start, String end, int maxFlights) {
+        PriorityQueue<FlightRoute> pq = new PriorityQueue<>(Comparator.comparingInt(FlightRoute::getCost));
+        pq.add(new FlightRoute(new ArrayList<>(List.of(start)), 0));
+
+        List<FlightRoute> result = new ArrayList<>();
+        while (!pq.isEmpty()) {
+            FlightRoute current = pq.poll();
+            String lastCity = current.getRoute().get(current.getRoute().size() - 1);
+            if (lastCity.equals(end)) {
+                result.add(current);
+                continue;
+            }
+
+            if (current.getRoute().size() > maxFlights) continue;
+            for (Node neighbor : flightGraph.getOrDefault(lastCity, Collections.emptyList())) {
+                List<String> newPath = new ArrayList<>(current.getRoute());
+                newPath.add(neighbor.data);
+                pq.add(new FlightRoute(newPath, current.getCost() + neighbor.cost));
+            }
+        }
+        return result;
+    }
+
+    public List<FlightRoute> getAllRoutesSorted(List<Flight> flights, String startCity, String endCity, int maxFlights) {
+        buildGraph(flights);
+        return findRoutes(startCity, endCity, maxFlights);
+    }
+}
+>>>>>>> 1cadbfd (Initial commit)
