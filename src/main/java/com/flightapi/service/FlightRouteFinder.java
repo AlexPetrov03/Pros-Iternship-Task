@@ -32,7 +32,8 @@ public class FlightRouteFinder {
     }
 
     private void findRoutes(int start, int end, List<FlightRoute> routes, int maxFlights) {
-        PriorityQueue<FlightRoute> pq = new PriorityQueue<>(Comparator.comparingInt(FlightRoute::getCost));
+        PriorityQueue<FlightRoute> pq = new PriorityQueue<>(
+                Comparator.comparingInt(FlightRoute::getCost).thenComparingInt(route -> route.getRoute().size()));
         Set<String> visitedRoutes = new HashSet<>();
         pq.add(new FlightRoute(new ArrayList<>(List.of(indexToCity.get(start))), 0));
 

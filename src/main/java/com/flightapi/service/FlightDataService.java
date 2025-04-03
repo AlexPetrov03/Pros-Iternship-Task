@@ -24,20 +24,20 @@ public class FlightDataService {
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split(",");
                 if (tokens.length != 3) {
-                    throw new RuntimeException("Invalid flight data: " + line);
+                    throw new IllegalArgumentException("Invalid flight data: " + line);
                 }
 
                 String origin = tokens[0].trim();
                 String destination = tokens[1].trim();
 
                 if(origin.length() != 3 || destination.length() != 3) {
-                    throw new RuntimeException("Invalid city data: " + line);
+                    throw new IllegalArgumentException("Invalid city data: " + line);
                 }
 
                 int cost = Integer.parseInt(tokens[2].trim());
 
                 if(cost <= 0){
-                    throw new RuntimeException("Invalid flight cost: " + line);
+                    throw new IllegalArgumentException("Invalid flight cost: " + line);
                 }
 
                 result.add(new Flight(origin, destination, cost));
